@@ -2,19 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\StoreRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class ProductController extends BaseApiController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $products = Product::get();
+
+        if ($products) {
+            return $this->handleSuccess($products, 'Success');
+        }
+
+        return $this->handleFailure(null, 'Something went wrong');
     }
 
     /**
