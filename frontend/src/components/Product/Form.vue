@@ -8,6 +8,8 @@
 
 <script>
 
+import request from "../../utils/request";
+
 export default {
     name: 'ProductsForm',
 
@@ -19,10 +21,12 @@ export default {
     },
     methods: {
         submit() {
-            this.$emit('submit', {
+            request('post', 'products', {
                 name: this.name,
                 price: this.price,
-            })
+            }).then(() => {
+                this.$router.push({ name: 'products' });
+            });
         }
     }
 }

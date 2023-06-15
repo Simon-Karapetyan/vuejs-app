@@ -37,10 +37,11 @@ class ProductController extends BaseApiController
     {
         $product = Product::create($request->all());
 
-        if (! $product) {
-            $this->handleFailure($product, 'Product has been created');
+        if ($product) {
+            return $this->handleSuccess($product, 'Success');
         }
 
+        $this->handleFailure($product, 'Product has been created');
     }
 
     /**
@@ -72,6 +73,8 @@ class ProductController extends BaseApiController
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+
+        return $this->handleSuccess(null, 'Success');
     }
 }

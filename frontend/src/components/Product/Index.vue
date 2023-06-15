@@ -1,10 +1,11 @@
 <template>
     <div class="product-container">
         <h2>Products</h2>
-        <ul>
+        <ul class="product-list">
             <li v-for="product in products" :key="product.id">
                 <p><b class="bold">Name:</b> {{ product.name }}</p>
                 <p><b class="bold">Price:</b> {{ product.price }}</p>
+                <b class="bold" style="color: red" @click="handleDeleteProduct(product.id)">X</b>
             </li>
         </ul>
 
@@ -15,26 +16,40 @@
 <script>
 import request from "../../utils/request";
 import { useProductStore } from '../../stores/product.js';
-import { mapActions } from 'pinia';
-const productsStore = useProductStore();
+import { toRaw } from "vue";
+
 export default {
     name: 'ProductsIndex',
 
-    async mounted() {
-        const products = await request('GET','products');
+    data() {
+        return {
+            products: [],
+        };
+    },
 
-        if (products) {
-            productsStore.setData(products?.data.data);
+    async mounted() {
+        const productsStore = useProductStore();
+
+        try {
+            const products = await request('GET', 'products');
+            if (products) {
+                productsStore.setData(products?.data.data);
+            }
+
+            this.products = toRaw(productsStore.products);
+        } catch (error) {
+            console.error('Error retrieving products:', error);
         }
     },
+
     methods: {
-        ...mapActions(useProductStore, ['setData']),
-    },
+        handleDeleteProduct(id) {
+            const productsStore = useProductStore();
 
-    setup() {
-        const products = productsStore.products;
+            request('DELETE', `products/${id}`);
 
-        return { products };
+            productsStore.deleteData(id);
+        }
     }
 }
 </script>
@@ -49,7 +64,7 @@ export default {
     font-weight: bold;
 }
 
-.create-btn {
-    margin-top: 20px;
+.product-list {
+    margin-bottom: 20px;
 }
 </style>
